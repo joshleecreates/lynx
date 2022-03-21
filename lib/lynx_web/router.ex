@@ -14,16 +14,17 @@ defmodule LynxWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", LynxWeb do
-    pipe_through :browser
-
-    get "/", PageController, :index
-  end
-
   scope "/api", LynxWeb do
     pipe_through :api
 
     resources "/uris", ShortenedURIController, only: [:create, :show]
+  end
+
+  scope "/", LynxWeb do
+    pipe_through :browser
+
+    get "/", PageController, :index
+    get "/:slug", ShortenedURIController, :go
   end
 
   # Other scopes may use custom stacks.

@@ -19,4 +19,9 @@ defmodule LynxWeb.ShortenedURIController do
     shortened_uri = Shortcuts.get_shortened_uri!(slug)
     render(conn, "show.json", shortened_uri: shortened_uri)
   end
+
+  def go(conn, %{"slug" => slug}) do
+    shortened_uri = Shortcuts.get_shortened_uri!(slug)
+    redirect(conn, external: shortened_uri.uri)
+  end
 end
