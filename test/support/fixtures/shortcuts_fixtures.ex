@@ -11,8 +11,8 @@ defmodule Lynx.ShortcutsFixtures do
     {:ok, shortened_uri} =
       attrs
       |> Enum.into(%{
-        slug: "some slug",
-        uri: "some uri"
+        slug: "abcdef",
+        uri: "https://www.stord.com"
       })
       |> Lynx.Shortcuts.create_shortened_uri()
 

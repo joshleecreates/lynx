@@ -20,6 +20,12 @@ defmodule LynxWeb.Router do
     get "/", PageController, :index
   end
 
+  scope "/api", LynxWeb do
+    pipe_through :api
+
+    resources "/uris", ShortenedURIController, only: [:create, :show]
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", LynxWeb do
   #   pipe_through :api

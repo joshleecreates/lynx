@@ -8,18 +8,7 @@ defmodule Lynx.Shortcuts do
 
   alias Lynx.Shortcuts.ShortenedURI
 
-  @doc """
-  Returns the list of uris.
-
-  ## Examples
-
-      iex> list_uris()
-      [%ShortenedURI{}, ...]
-
-  """
-  def list_uris do
-    Repo.all(ShortenedURI)
-  end
+  alias Lynx.Utils
 
   @doc """
   Gets a single shortened_uri.
@@ -35,7 +24,7 @@ defmodule Lynx.Shortcuts do
       ** (Ecto.NoResultsError)
 
   """
-  def get_shortened_uri!(id), do: Repo.get!(ShortenedURI, id)
+  def get_shortened_uri!(slug), do: Repo.get_by!(ShortenedURI, slug: slug)
 
   @doc """
   Creates a shortened_uri.
@@ -50,55 +39,22 @@ defmodule Lynx.Shortcuts do
 
   """
   def create_shortened_uri(attrs \\ %{}) do
+    attrs = for {k, v} <- attrs,
+               do: {to_string(k), v}, into: %{}
+    attrs = Map.put(attrs, "slug", String.downcase(Utils.random_string(6)))
+
     %ShortenedURI{}
     |> ShortenedURI.changeset(attrs)
     |> Repo.insert()
+    |> maybe_retry_uri_insertion(attrs)
   end
 
-  @doc """
-  Updates a shortened_uri.
+  defp maybe_retry_uri_insertion({:ok, uri}, _), do: {:ok, uri}
 
-  ## Examples
-
-      iex> update_shortened_uri(shortened_uri, %{field: new_value})
-      {:ok, %ShortenedURI{}}
-
-      iex> update_shortened_uri(shortened_uri, %{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def update_shortened_uri(%ShortenedURI{} = shortened_uri, attrs) do
-    shortened_uri
-    |> ShortenedURI.changeset(attrs)
-    |> Repo.update()
+  # retry on slug collision
+  defp maybe_retry_uri_insertion({:error, %{errors: %{slug: _}}}, attrs) do
+    create_shortened_uri(attrs)
   end
 
-  @doc """
-  Deletes a shortened_uri.
-
-  ## Examples
-
-      iex> delete_shortened_uri(shortened_uri)
-      {:ok, %ShortenedURI{}}
-
-      iex> delete_shortened_uri(shortened_uri)
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def delete_shortened_uri(%ShortenedURI{} = shortened_uri) do
-    Repo.delete(shortened_uri)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking shortened_uri changes.
-
-  ## Examples
-
-      iex> change_shortened_uri(shortened_uri)
-      %Ecto.Changeset{data: %ShortenedURI{}}
-
-  """
-  def change_shortened_uri(%ShortenedURI{} = shortened_uri, attrs \\ %{}) do
-    ShortenedURI.changeset(shortened_uri, attrs)
-  end
+  defp maybe_retry_uri_insertion(error, _), do: error
 end
