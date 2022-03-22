@@ -80,7 +80,7 @@ export default function URIForm() {
             <div className="field has-addons">
               <p className="control">
                 <a className="button is-static is-large">
-                  https://
+                  http://
                 </a>
               </p>
               <div className="control">
