@@ -1,0 +1,34 @@
+On backend testing:
+
+The backend tests cover all happy paths and *most* unhappy paths. There is a potential
+scenario where the randomly generated slugs will collide, causing an error, and this code
+path is currently untested. Testing this scenario would require mocking a random number generator
+in order to ensure a collision, and either using compile time config or runtime injection
+in order to replace the `Utils.random_string/1` function definition during testing. My feeling is that
+mocking this would introduce more brittleness to the code than is worthwhile.
+
+Also, it is possible that the slug generation logic should be removed from the context and moved to the
+controller layer. I would probably want to know what the next use case is (e.g. can premium users choose their own slug?)
+before deciding on where this logic should ultimately reside.
+
+On Bulma:
+
+I have *extensive* experience hand crafting SASS/CSS and building custom style libraries. For this project
+nothing more than basic formatting and typography was required, and so using a lightweight framework
+like Bulma felt appropriate.
+
+On the frontend testing:
+
+There is a lot of work that could be done to improve this front end's maintainability. The `UIForm`
+component has grown to the point where it should probably be refactored into a collection of modules
+and components. One of my working philosophies is "first make it work, then make it good." In a commercial
+environment I would likely undertake some refactoring while adding whatever the next feature might be.
+
+This refactoring would likely include:
+  - Separate the API calls from the Form component
+  - Adding Immutable.js or some other convenience library for use in hook callbacks
+  - Creating components for global elements like headers and footers and navigation
+  - Creating or importing reusable form components with error/success validation states, help text, etc.
+  - Some custom CSS and possibly deeper integration with bulma.
+  - Adding jest/enzyme for unit testing the front end
+  - Adding cypress for e2e testing. This would ideally integrate cypress with phoenix so that all e2e tests could be run easily in a phoenix test env.
